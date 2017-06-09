@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -22,6 +23,13 @@ public class PropertyGroup {
     String id;
     PropertiesStorage ps;
 
+    class CachedString {
+        long lastUpdate;
+        String value;
+    }
+
+    private final HashMap<String, CachedString> cachedValues = new HashMap<>();
+
     public PropertyGroup(PropertiesStorage ps,String id) {
         this.id = id;
         this.ps = ps;
@@ -31,6 +39,13 @@ public class PropertyGroup {
             throws SQLException
     {
         String ret = null;
+
+        if (ps.getCacheTimeout() > 0 && cachedValues.containsKey(name)) {
+            long now = System.currentTimeMillis();
+            CachedString cachedValue = cachedValues.get(name);
+            if (cachedValue.lastUpdate + ps.getCacheTimeout() > now)
+                return cachedValue.value;
+        }
 
         Connection con = ps.getConnection();
         Statement stm = con.createStatement();
@@ -47,14 +62,37 @@ public class PropertyGroup {
         result.close();
         stm.close();
 
+        if (ps.getCacheTimeout() > 0) {
+            setCachedValue(name, ret);
+        }
+
         return ret;
+    }
+
+    private void setCachedValue(String key, String value) {
+        CachedString cachedValue = cachedValues.get(key);
+        if (cachedValue == null) {
+            cachedValue = new CachedString();
+            cachedValues.put(key, cachedValue);
+        }
+        cachedValue.lastUpdate = System.currentTimeMillis();
+        cachedValue.value = value;
     }
 
     public String getProperty(String name, String default_value)
             throws SQLException
     {
         String ret = getProperty(name);
-        return ret == null ? default_value : ret;
+
+        if (ret != null)
+            return ret;
+
+        ret = default_value;
+        if (ps.getCacheTimeout() > 0) {
+            setCachedValue(name, ret);
+        }
+
+        return ret;
     }
 
     public void setProperty(String name, String value)
@@ -70,5 +108,9 @@ public class PropertyGroup {
         System.out.println(sql);
         stm.execute(sql);
         stm.close();
+
+        if (ps.getCacheTimeout() > 0) {
+            setCachedValue(name, value);
+        }
     }
 }

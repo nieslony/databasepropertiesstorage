@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,15 +18,25 @@ import java.sql.Statement;
  * @author claas
  */
 public class PropertiesStorage {
-    Connection con;
-    String propsTable;
-    String propGroupsTable;
+    private Connection con;
+    private String propsTable;
+    private String propGroupsTable;
+    private long cacheTimeout = 0;
+    private final HashMap<String, PropertyGroup> propertyGroups = new HashMap<>();
 
     public Connection getConnection() {
         return con;
     }
 
     protected PropertiesStorage() {
+    }
+
+    public void setCacheTimeout(long msec) {
+        cacheTimeout = msec;
+    }
+
+    public long getCacheTimeout() {
+        return cacheTimeout;
     }
 
     protected void setConnection(Connection con) {
@@ -71,7 +82,10 @@ public class PropertiesStorage {
     public PropertyGroup getGroup(String name)
             throws SQLException
     {
-        PropertyGroup grp = null;
+        PropertyGroup grp = propertyGroups.get(name);
+
+        if (grp != null)
+            return grp;
 
         Connection con = getConnection();
         if (con != null) {
@@ -84,6 +98,7 @@ public class PropertiesStorage {
                 String id = result.getString("id");
 
                 grp = new PropertyGroup(this, id);
+                propertyGroups.put(name, grp);
             }
             result.close();
         }
