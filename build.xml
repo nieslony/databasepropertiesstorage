@@ -12,7 +12,7 @@
     <import file="nbproject/build-impl.xml"/>
     
     <target name="-post-compile">
-        <copy file="src/sql/create-tables.sql" todir="build"/>
+        <copy file="src/sql/create-properties-storage.sql" todir="build"/>
     </target>
     
     <!--
