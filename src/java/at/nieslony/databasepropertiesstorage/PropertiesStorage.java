@@ -24,8 +24,12 @@ public class PropertiesStorage {
     private long cacheTimeout = 0;
     private final HashMap<String, PropertyGroup> propertyGroups = new HashMap<>();
 
-    public Connection getConnection() {
-        return con;
+    public Connection getConnection()
+            throws SQLException
+    {
+        if (con.isValid(1))
+            return con;
+        return null;
     }
 
     protected PropertiesStorage() {
