@@ -1,6 +1,11 @@
 package at.nieslony.databasepropertiesstorage;
 
 
+import at.nieslony.utils.DbUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +35,39 @@ public class PropertiesStorage {
         if (con.isValid(1))
             return con;
         return null;
+    }
+
+    public void createTables()
+            throws IOException, SQLException, PropertiesStorageException
+    {
+        final String resourceName = "/sql/create-properties-storage.sql";
+
+        Reader r = null;
+        try {
+            InputStream is = getClass().getClassLoader().getResourceAsStream(resourceName);
+            if (is != null)
+                r = new InputStreamReader(is);
+            else {
+                throw new PropertiesStorageException(
+                        String.format("Cannot get resource %s", resourceName));
+            }
+
+            if (r == null) {
+                throw new PropertiesStorageException(
+                        String.format("Cannot create reader for resource %s", resourceName));
+            }
+            Connection con = getConnection();
+            if (con == null) {
+                throw new PropertiesStorageException(
+                        String.format("Cannot get database connection"));
+            }
+            DbUtils.executeSql(con, r);
+        }
+        finally {
+            if (r != null) {
+                r.close();
+            }
+        }
     }
 
     protected PropertiesStorage() {

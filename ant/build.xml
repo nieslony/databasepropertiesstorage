@@ -5,24 +5,27 @@
         DatabsePropertiesStorage
     </description>
     
-    <property name="version" value="0.1"/>
+    <property name="version" value="0.1git"/>
     <property name="projectname" value="databasepropertiesstorage"/>
     
     <property name="root.dir"  value=".."/>
     <property name="build.dir" value="${root.dir}/build"/>
     <property name="dist.dir" value="${root.dir}/dist"/>
     <property name="src.dir"   value="${root.dir}/src"/>
+    <property name="sql.dir"   value="${root.dir}/src/sql"/>
     
     <property name="spec.file" value="${projectname}.spec"/>
     
     <target name="compile">
         <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.dir}/sql"/>
         <javac 
             destdir="${build.dir}"
             includeantruntime="false"
             >
             <src path="${src.dir}"/>
         </javac>
+        <copy todir="${build.dir}/sql" file="${sql.dir}/create-properties-storage.sql"/>
     </target>
     
     <target name="dist" depends="compile">
