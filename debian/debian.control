@@ -1,0 +1,13 @@
+Source: databasepropertiesstorage
+Section: devel
+Priority: optional
+Maintainer: Claas Nieslony <osc@nieslony.at>
+Build-Depends: debhelper (>= 9),
+    openjdk-8-jdk,
+    default-jdk, default-jdk-doc, javahelper
+Standards-Version: @VERSION@
+
+Package: databasepropertiesstorage
+Architecture: all
+Depends: libpostgresql-jdbc-java
+Description: Store properties in postgresql database
