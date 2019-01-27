@@ -18,13 +18,13 @@ CREATE INDEX ON propertygroups (name);;
 
 CREATE TABLE properties (
     group_id SERIAL references propertyGroups(id),
-    name varchar NOT NULL,
-    value varchar,
+    name text NOT NULL,
+    value text,
     UNIQUE (group_id, name)
 );;
 
 
-CREATE OR REPLACE FUNCTION set_property(_group_id int, _name varchar, _value varchar) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION set_property(_group_id int, _name text, _value text) RETURNS VOID AS $$
     DECLARE
     BEGIN
         UPDATE properties SET value = _value WHERE group_id = _group_id AND name = _name;
