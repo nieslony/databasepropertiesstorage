@@ -2,9 +2,9 @@ package at.nieslony.databasepropertiesstorage;
 
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 
 /*
@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class PropertyGroup {
     private PropertyGroup() {}
 
-    String id;
+    int id;
     PropertiesStorage ps;
 
     class CachedString {
@@ -30,7 +30,7 @@ public class PropertyGroup {
 
     private final HashMap<String, CachedString> cachedValues = new HashMap<>();
 
-    public PropertyGroup(PropertiesStorage ps,String id) {
+    public PropertyGroup(PropertiesStorage ps, int id) {
         this.id = id;
         this.ps = ps;
     }
@@ -48,14 +48,13 @@ public class PropertyGroup {
         }
 
         Connection con = ps.getConnection();
-        Statement stm = con.createStatement();
-        String sql = String.format(
-                "SELECT value FROM %s WHERE group_id='%s' AND name='%s';",
-                ps.getPropsTable(),
-                id,
-                name);
-        System.out.println(sql);
-        ResultSet result = stm.executeQuery(sql);
+        String sql = String.format("SELECT value FROM %s WHERE group_id = ? AND name = ?;", ps.getPropsTable());
+        PreparedStatement stm = con.prepareStatement(sql);
+        int pos = 1;
+        stm.setInt(pos++, id);
+        stm.setString(pos++, name);
+
+        ResultSet result = stm.executeQuery();
         if (result.next()) {
             ret = result.getString("value");
         }
@@ -99,14 +98,13 @@ public class PropertyGroup {
             throws SQLException
     {
         Connection con = ps.getConnection();
-        Statement stm = con.createStatement();
-        String sql = String.format(
-                "SELECT set_property('%s', '%s', '%s')",
-                id,
-                name,
-                value);
-        System.out.println(sql);
-        stm.execute(sql);
+        String sql = "SELECT set_property(?, ?, ?);";
+        PreparedStatement stm = con.prepareStatement(sql);
+        int pos = 1;
+        stm.setInt(pos++, id);
+        stm.setString(pos++, name);
+        stm.setString(pos++, value);
+        stm.execute();
         stm.close();
 
         if (ps.getCacheTimeout() > 0) {

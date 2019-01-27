@@ -7,9 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 
 /*
@@ -112,12 +112,12 @@ public class PropertiesStorage {
     {
         Connection con = getConnection();
         if (con != null) {
-            Statement stmt = con.createStatement();
-            String sql = String.format("INSERT INTO %s(name) VALUES('%s');",
-                    propGroupsTable, name);
-            System.out.println(sql);
-            stmt.execute(sql);
-            stmt.close();
+            String sql = String.format("INSERT INTO %s (name) VALUES(?);", propGroupsTable);
+            PreparedStatement stm = con.prepareStatement(sql);
+            int pos = 1;
+            stm.setString(pos++, name);
+            stm.executeUpdate();
+            stm.close();
         }
     }
 
@@ -131,18 +131,18 @@ public class PropertiesStorage {
 
         Connection con = getConnection();
         if (con != null) {
-            Statement stmp = con.createStatement();
-            String sql = String.format("SELECT id FROM %s WHERE name = '%s'",
-                    propGroupsTable, name);
-            System.out.println(sql);
-            ResultSet result = stmp.executeQuery(sql);
-            if (result.next()) {
-                String id = result.getString("id");
+            String sql = String.format("SELECT id FROM %s WHERE name = ?;", propGroupsTable);
+            PreparedStatement stm = con.prepareStatement(sql);
+            int pos = 1;
+            stm.setString(pos++, name);
+            try (ResultSet result = stm.executeQuery()) {
+                if (result.next()) {
+                    int id = result.getInt("id");
 
-                grp = new PropertyGroup(this, id);
-                propertyGroups.put(name, grp);
+                    grp = new PropertyGroup(this, id);
+                    propertyGroups.put(name, grp);
+                }
             }
-            result.close();
         }
 
         return grp;
