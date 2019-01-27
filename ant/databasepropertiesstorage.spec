@@ -12,7 +12,7 @@ BuildRequires:  ant
 BuildArch:  noarch
 
 %if 0%{?fedora}
-BuildRequires:  java-1.8.0-openjdk-devel 
+BuildRequires:  java-1.8.0-openjdk-devel lua
 %endif
 %if 0%{?centos_version}
 BuildRequires:  java-1.8.0-openjdk-devel 
