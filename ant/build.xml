@@ -39,7 +39,7 @@
         <delete dir="${dist.dir}"/>
     </target>
     
-    <target name="tar">
+    <target name="tar" depends="patch-spec">
         <property name="tar-prefix" value="${projectname}-${version}"/>
         <mkdir dir="${dist.dir}"/>
         <tar destfile="${dist.dir}/${projectname}-${version}.tar.gz"
