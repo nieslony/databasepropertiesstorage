@@ -12,6 +12,11 @@ package at.nieslony.databasepropertiesstorage;
 public class PropertiesStorageException extends Exception {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7514936251176991681L;
+
+	/**
      * Creates a new instance of <code>PropertiesStorageException</code> without
      * detail message.
      */
