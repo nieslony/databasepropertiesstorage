@@ -18,23 +18,28 @@
     
     <target name="compile">
         <mkdir dir="${build.dir}"/>
-        <mkdir dir="${build.dir}/sql"/>
         <javac 
             destdir="${build.dir}"
             includeantruntime="false"
             >
             <src path="${src.dir}"/>
         </javac>
-        <copy todir="${build.dir}/sql" file="${sql.dir}/create-properties-storage.sql"/>
     </target>
     
+	<target name="copy-static">
+		<mkdir dir="${build.dir}/sql"/>
+		<copy todir="${build.dir}/sql">
+			<fileset dir="${sql.dir}"/>
+		</copy>
+	</target>
+	
     <target name="jar">
         <mkdir dir="${dist.dir}"/>
         <jar jarfile="${dist.dir}/${projectname}-${version}.jar"
              basedir="${build.dir}"/>
     </target>
 
-    <target name="dist" depends="compile,jar">
+    <target name="dist" depends="compile,copy-static,jar">
     </target>
     
     <target name="clean">
