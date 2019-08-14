@@ -28,7 +28,7 @@ Stores grouped name/value pairs in a PostgrSQL database
 %setup
 
 %build
-ant dist -Droot.dir=%{_builddir}/%{name}-%{version}
+ant dist -Droot.dir=%{_builddir}/%{name}-%{version} -Dversion=%{version}
 
 %install
 mkdir -vp %{buildroot}/usr/share/java
