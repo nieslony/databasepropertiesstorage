@@ -25,6 +25,13 @@
             <src path="${src.dir}"/>
         </javac>
     </target>
+	
+	<target name="create-unversioned-link">
+		<symlink 
+			link="${dist.dir}/${projectname}.jar"
+			resource="${projectname}-${version}.jar"
+		/>
+	</target>
     
 	<target name="copy-static">
 		<mkdir dir="${build.dir}/sql"/>
@@ -39,8 +46,7 @@
              basedir="${build.dir}"/>
     </target>
 
-    <target name="dist" depends="compile,copy-static,jar">
-    </target>
+    <target name="dist" depends="compile,copy-static,jar,create-unversioned-link"/>
     
     <target name="clean">
         <delete dir="${build.dir}"/>
