@@ -52,15 +52,7 @@ public class PropertiesStorage {
                         String.format("Cannot get resource %s", resourceName));
             }
 
-            if (r == null) {
-                throw new PropertiesStorageException(
-                        String.format("Cannot create reader for resource %s", resourceName));
-            }
             Connection con = getConnection();
-            if (con == null) {
-                throw new PropertiesStorageException(
-                        String.format("Cannot get database connection"));
-            }
             DbUtils.executeSql(con, r);
         }
         finally {
